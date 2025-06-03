@@ -44,10 +44,10 @@ NOTION_HEADERS = {
     "Sec-Fetch-Dest": "empty",
     "Cookie": os.getenv("NOTION_COOKIE"),
     "notion-client-version": "23.13.0.3718",
-    "x-notion-space-id": "92aa879c-fe5a-81e9-84b0-0003ae3d779a",
+    "x-notion-space-id": os.getenv("NOTION_SPACE_ID"),
     "Priority": "u=3, i",
     "notion-audit-log-platform": "web",
-    "x-notion-active-user-header": "1fed872b-594c-81bd-9cb6-0002de215c90"
+    "x-notion-active-user-header": os.getenv("NOTION_ACTIVE_USER_HEADER")
 }
 
 trace_id = os.getenv("TRACE_ID")
