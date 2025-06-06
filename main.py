@@ -50,13 +50,16 @@ NOTION_HEADERS = {
     "x-notion-active-user-header": os.getenv("NOTION_ACTIVE_USER_HEADER")
 }
 
-trace_id = os.getenv("TRACE_ID")
-space_id = os.getenv("SPACE_ID")
-thread_id = os.getenv("THREAD_ID")
-user_id = os.getenv("USER_ID")
-space_view_id = os.getenv("SPACE_VIEW_ID")
+TRACE_ID = os.getenv("TRACE_ID")
+SPACE_ID = os.getenv("SPACE_ID")
+THREAD_ID = os.getenv("THREAD_ID")
+USER_ID = os.getenv("USER_ID")
+SPACE_VIEW_ID = os.getenv("SPACE_VIEW_ID")
 
 NOTION_BEARER_TOKEN = os.getenv("NOTION_BEARER_TOKEN")
+
+if not NOTION_BEARER_TOKEN or not NOTION_API_URL or not TRACE_ID or not SPACE_ID or not THREAD_ID or not USER_ID or not SPACE_VIEW_ID:
+    raise ValueError("Environment variables are not set")
 
 def verify_bearer_token(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
@@ -78,10 +81,10 @@ def convert_to_notion_format(
     context_value = {
         "timezone": "Asia/Shanghai",
         "userName": "",
-        "userId": user_id,
+        "userId": USER_ID,
         "spaceName": "",
-        "spaceId": space_id,
-        "spaceViewId": space_view_id,
+        "spaceId": SPACE_ID,
+        "spaceViewId": SPACE_VIEW_ID,
         "currentDatetime": now,
         "surface": "home_module"
     }
@@ -117,15 +120,15 @@ def convert_to_notion_format(
                 "id": str(uuid.uuid4()),
                 "type": msg.role,
                 "value": [[msg.content]],
-                "userId": user_id,
+                "userId": USER_ID,
                 "createdAt": now
             })
 
     notion_request = {
-        "traceId": trace_id,
-        "spaceId": space_id,
+        "traceId": TRACE_ID,
+        "spaceId": SPACE_ID,
         "transcript": transcript,
-        "threadId": thread_id,
+        "threadId": THREAD_ID,
         "createThread": False,
         "debugOverrides": {"cachedInferences":{},"annotationInferences":{},"emitInferences":False},
         "generateTitle": True,
