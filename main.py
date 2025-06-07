@@ -27,7 +27,7 @@ class ChatCompletionRequest(BaseModel):
     stream: Optional[bool] = False
 
 # Notion API 配置
-NOTION_API_URL = os.getenv("NOTION_API_URL")
+API_URL = os.getenv("API_URL")
 
 NOTION_HEADERS = {
     "Content-Type": "application/json",
@@ -42,12 +42,12 @@ NOTION_HEADERS = {
     "Referer": "https://www.notion.so/chat",
     "Accept-Encoding": "gzip, deflate, br",
     "Sec-Fetch-Dest": "empty",
-    "Cookie": os.getenv("NOTION_COOKIE"),
+    "Cookie": os.getenv("COOKIE"),
     "notion-client-version": "23.13.0.3718",
-    "x-notion-space-id": os.getenv("NOTION_SPACE_ID"),
+    "x-notion-space-id": os.getenv("SPACE_ID"),
     "Priority": "u=3, i",
     "notion-audit-log-platform": "web",
-    "x-notion-active-user-header": os.getenv("NOTION_ACTIVE_USER_HEADER")
+    "x-notion-active-user-header": os.getenv("USER_ID")
 }
 
 TRACE_ID = os.getenv("TRACE_ID")
@@ -56,16 +56,16 @@ THREAD_ID = os.getenv("THREAD_ID")
 USER_ID = os.getenv("USER_ID")
 SPACE_VIEW_ID = os.getenv("SPACE_VIEW_ID")
 
-NOTION_BEARER_TOKEN = os.getenv("NOTION_BEARER_TOKEN")
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
 
-if not NOTION_BEARER_TOKEN or not NOTION_API_URL or not TRACE_ID or not SPACE_ID or not THREAD_ID or not USER_ID or not SPACE_VIEW_ID:
+if not BEARER_TOKEN or not API_URL or not TRACE_ID or not SPACE_ID or not THREAD_ID or not USER_ID or not SPACE_VIEW_ID:
     raise ValueError("Environment variables are not set")
 
 def verify_bearer_token(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="缺少或无效的 Authorization 头")
     token = authorization.split("Bearer ")[1]
-    if token != NOTION_BEARER_TOKEN:
+    if token != BEARER_TOKEN:
         raise HTTPException(status_code=401, detail="无效的 Bearer Token")
 
 def convert_to_notion_format(
@@ -167,7 +167,7 @@ async def stream_notion_to_openai(notion_request: Dict[str, Any]):
     print("开始流式转换Notion响应为OpenAI格式, 时间:", time.time())
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            NOTION_API_URL,
+            API_URL,
             headers=NOTION_HEADERS,
             json=notion_request
         ) as response:
@@ -209,7 +209,7 @@ async def chat_completions(
         # 非流式响应
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                NOTION_API_URL,
+                API_URL,
                 headers=NOTION_HEADERS,
                 json=notion_request
             ) as response:
